@@ -10,9 +10,9 @@ use std::rc::Rc;
 /// </aside>
 /// `Rc` wrapper used to make it clonable.
 #[must_use]
-pub struct Callback<IN>(Rc<Fn(IN)>);
+pub struct Callback<IN>(Rc<FnMut(IN)>);
 
-impl<IN, F: Fn(IN) + 'static> From<F> for Callback<IN> {
+impl<IN, F: FnMut(IN) + 'static> From<F> for Callback<IN> {
     fn from(func: F) -> Self {
         Callback(Rc::new(func))
     }
@@ -42,7 +42,7 @@ impl<IN: 'static> Callback<IN> {
     /// Works like common `map` method but in an opposite direction.
     pub fn reform<F, T>(self, func: F) -> Callback<T>
     where
-        F: Fn(T) -> IN + 'static,
+        F: FnMut(T) -> IN + 'static,
     {
         let func = move |input| {
             let output = func(input);
